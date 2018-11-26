@@ -1,0 +1,15 @@
+#installer: sudo  apt installcurl et whois
+
+# Obtention de l'adresse ip public
+
+curl ifconfig.me
+
+ippublic=curl ifconfig.me
+
+# mettre le résultat dans une variable ippublic
+
+
+
+FAI=whois $ippublic | grep  descr: | sed -n 2p | awk '{print $2}'
+
+echo " votre fournisseur d'accés est :" $FAI

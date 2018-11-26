@@ -1,0 +1,37 @@
+#!/bin/bash
+declare a b 
+echo "Quel adresse souhaitez vous tester ?"
+b=0
+max=0
+min=10
+read a
+echo "Traitement en cours ... "
+
+while [ $b -lt 10 ] 
+ 
+do
+	teste=$(ping -c 1 -q $a| grep rtt | awk -F'/' {'print $5'})
+	b=$[ $b + 1 ]
+	
+	if test $( echo " $teste >$max" | bc -l ) -eq 1; then
+		max="$teste"
+		fi
+	if test $( echo " $teste <$min" | bc -l ) -eq 1; then
+	min="$teste"
+
+	fi
+	echo "ping $b : $teste --> $(date) 
+min= $min             			       max=$max "
+sleep 1s
+done > heure10.txt
+tmin=$(grep $min heure10.txt | awk {'print $10'})
+vmin=$(grep $min heure10.txt | awk {'print $4'})
+tmax=$(grep $max heure10.txt | awk {'print $10'})
+vmax=$(grep $max heure10.txt | awk {'print $4'})
+echo " <i> Bonjour Madame, Monsieur,</i> 
+
+La valeur min: $vmin s'affiche à  $tmin 
+La valeur max: $vmax s'affiche à $tmax " > joaking.html
+
+mail -a "MINE-version: 1.0" -a "Content-Type: text/html" -s "Compte rendu" testdatametrie@outlook.fr < joaking.html
+

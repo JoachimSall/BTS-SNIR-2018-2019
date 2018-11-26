@@ -1,0 +1,36 @@
+#!/bin/bash
+declare a b 
+echo "Quel adresse souhaitez vous tester ?"
+b=0
+max=0
+min=10
+read a
+echo "Traitement en cours ... "
+
+while [ $b -lt 10 ] 
+ 
+do
+	teste=$(ping -c 1 -q $a| grep rtt | awk -F'/' {'print $5'})
+	b=$[ $b + 1 ]
+	
+	if test $( echo " $teste >$max" | bc -l ) -eq 1; then
+		max="$teste"
+		fi
+	if test $( echo " $teste <$min" | bc -l ) -eq 1; then
+	min="$teste"
+
+	fi
+	echo "ping $b : $teste --> $(date) 
+min= $min             			       max=$max "
+sleep 1s
+done > heure10.txt
+tmin=$(grep $min heure10.txt | awk {'print $10'})
+vmin=$(grep $min heure10.txt | awk {'print $4'})
+tmax=$(grep $max heure10.txt | awk {'print $10'})
+vmax=$(grep $max heure10.txt | awk {'print $4'})
+echo "Bonjour Madame, Monsieur, 
+
+l'heure d'arriver du ping $vmin ayant la valeur la plus basse est $tmin 
+L'heure d'arriver du ping $vmax ayant la valeur la plus haute est $tmax "> joaking.txt
+
+

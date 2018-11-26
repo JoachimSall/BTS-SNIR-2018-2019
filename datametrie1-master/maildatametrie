@@ -1,0 +1,19 @@
+#!/bin/bash
+declare a
+
+!!!!! le teste est :
+cat david.txt
+
+Rapport d\'observation Datametrie de votre moniteur [$a]
+
+Votre FAI est [nom du FAI]
+
+Datametrie1 a effectué 288 observation de l\'adresse [adresse du site web] sur une période de 24h
+
+La performance moyenne est [$moy]
+La performance minimale de [$min] est atteinte à [heure ping min]
+La performance maximale de [$max] est atteinte à [heure ping max]
+Le taux de disponibilité est de [$good]
+
+Vous pouvez accéder directement à tous les détails de vos statistiques personalisées sur notre site web client à l\'adresse [adresse où seront récoltées l\'intégralité des données]
+

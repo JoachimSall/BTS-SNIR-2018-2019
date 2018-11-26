@@ -1,0 +1,33 @@
+#!/bin/bash
+declare a b 
+declare -i c
+echo "rentrer le nom du site"
+read a
+b=0
+max=0
+min=10
+c=0
+export a
+export b
+export max
+export min
+while [ $b -lt 10 ] 
+do
+	teste=$(ping -c 1 -q $a| grep rtt | awk -F'/'  {'print $5'})  	
+	b=$[ $b + 1 ]
+	echo "$b"
+	echo "$teste"
+	sleep 1
+	if test $(echo "$teste > $max" | bc -l) -eq 1;then
+		max="$teste"
+	fi
+	echo "max = $max"
+	if test $(echo "$teste < $min" | bc -l) -eq 1;then
+		min="$teste"
+	fi
+	echo "min = $min"
+	echo "$(date)" 
+done
+mail -s "Projet Datametrie 4" tom_chif@hotmail.com 
+thomas tu me recois ?
+

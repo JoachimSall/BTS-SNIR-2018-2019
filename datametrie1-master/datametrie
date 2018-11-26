@@ -1,0 +1,289 @@
+#!/bin/bash
+#installer curl whois mailutils
+#demande à l'utilisateur l'adresse à tester sur tout le script
+echo "Bienvenue, avant de commencer, nous rappelons qu'il est nécessaire"
+echo "d'avoir installer les applications suivantes : mailutils / curl / whois"
+echo " "
+echo -n "Avez-vous pris en compte le message précédent ? Oui / Non ?"
+read ok
+clear
+echo -n "Quelle est votre Nom :"
+read nom
+clear
+echo -n "A quelle adresse mail envoyer les résultats : "
+read mail
+echo -n "Saissir à nouveau l'adresse mail : "
+read mail2
+clear
+echo -n "Quelle adresse voulez vous observer ?     "
+read ad
+clear
+echo -n "Définir la valeur du ping max avant échec : (en ms) "
+read z
+clear
+if ping -c1 $ad > /dev/null; #test sur 1ping si il y a une réponse
+	then echo "Analyse en cours ... Veuillez patienter" #le script continue
+	else echo -n "Mauvaise adresse, veuillez la renoter :"
+	read a
+	if ping -c1 $ad > /dev/null;
+		then echo "Analyse en cours"
+		else echo -n "L'adresse n'est pas accessible"
+	fi
+fi
+
+declare ad y day b e f fail reu moy xmoy z tpa h moypa duree p1 p2 p3 d1 d2 d3 c1 c2 c3
+declare -i c nbtenta  duree good xgood 
+#paramètrage des variables au rang 0
+b=0       #nombre de boucle heure
+e=0
+xmin=10   #valeur mini ping
+xmax=0    #valeur max ping journée
+xmoy=0    #valeur moy ping journée
+xreu=0    #valeur reussie journée
+pamin=10  #temps min chargement PA
+pamax=0   #temps max chargement PA
+y=0       #calcul moyenne journée
+xpamin=10 #temps min chargement PA journée
+xpamax=0  #temps max chargement PA journée
+q=0
+nbtenta=0
+# 50 #Obtention IP public puis recherche FAI
+ippublic=$(curl ifconfig.me)
+FAI=$(whois $ippublic | grep descr: | sed -n 2p | awk '{print $2}')
+clear
+echo "Analyse en cours ..."
+while [ $b -lt 12 ]     #boucle de 12x 2h (1 journée)
+do
+#remise à 0 des paramètres à chaque heure
+	c=0
+	min=10
+	max=0
+	date=0
+	f=0
+	h=0
+	reu=0
+	good=0
+	datemin=0
+	datemax=0
+	while [ $c -lt 4 ]    #Boucle de 24x 5min (2h)
+	do
+		tping=$(ping -c 1 -q $ad | grep rtt | awk -F'/' {'print $5'}) #valeur du ping
+		c=$[ $c + 1 ]
+		if test $(echo "$tping < $z" | bc -l ) -eq 1;then #test si ping < à une valeur max
+			tpa=$(/usr/bin/time -f "%e" wget -q --delete-after $ad  2>&1) #calcul temps chargement PA
+			if test $(echo "$tpa > $pamax" |bc -l ) -eq 1;then #recherche temps chargement max
+				pamax="$tpa"
+				datepamax="$(date +%H:%M:%S)"
+			fi
+			if test $(echo "$tpa < $pamin" |bc -l ) -eq 1;then #recherche temps chargement min
+				pamin="$tpa"
+				datepamin="$(date +%H:%M:%S)"
+			fi
+		fi
+		if test $(echo "$tping < $z" | bc -l ) -eq 1;then  #calcul %réussite
+			reu=$[ $reu + 1 ]
+		fi
+		if test $(echo "$tping > $max" | bc -l ) -eq 1;then  #recherche Max
+			max="$tping"
+			datemax="$(date +%H:%M:%S)"
+
+		fi
+		if test $(echo "$tping < $min" | bc -l ) -eq 1;then #recherche Min
+			min="$tping"
+			datemin="$(date +%H:%M:%S)"
+		fi
+		f=$(echo "scale=2; ($f + $tping)" | bc -l ) #Somme des ping
+		if test $(echo "$tping > $z" |bc -l ) -eq 1;then
+			tpa=0
+		fi
+		h=$(echo "scale=3; ($h + $tpa)" | bc -l ) #Somme temps de chargement
+		sleep 1s # 100 #temps de pause de 5min
+	done
+	moy=$(echo "scale=2; $f / $c" | bc -l ) #moyenne ping
+	moypa=$(echo "scale=2; $h /$reu" | bc -l ) #moyenne temps chargement
+	e=$b
+	b=$[ $b +1 ]
+	good=$[ $reu * 100 / $c | bc -l ]  #calcul %reussite pour l'heure écoulée
+	if [ $b = 1 ]; then
+		p1="$moy"
+		d1="$good"
+		c1="$moypa"
+	elif [ $b = 2 ]; then
+		p2="$moy"
+		d2="$good"
+		c2="$moypa"
+	elif [ $b = 3 ]; then
+		p3=$moy
+		d3=$good
+		c3=$moypa
+        elif [ $b = 4 ]; then
+		p4="$moy"
+		d4="$good"
+		c4="$moypa"
+	elif [ $b = 5 ]; then
+		p5=$moy
+		d5=$good
+		c5=$moypa
+        elif [ $b = 6 ]; then
+                p6="$moy"
+                d6="$good"
+                c6="$moypa"
+        elif [ $b = 7 ]; then
+                p7=$moy
+                d7=$good
+                c7=$moypa
+        elif [ $b = 8 ]; then
+                p8="$moy"
+                d8="$good"
+                c8="$moypa"
+        elif [ $b = 9 ]; then
+                p9=$moy
+                d9=$good
+                c9=$moypa
+        elif [ $b = 10 ]; then
+                p10="$moy"
+                d10="$good"
+                c10="$moypa"
+        elif [ $b = 11 ]; then
+                p11=$moy
+                d11=$good
+                c11=$moypa
+#150
+	else
+		p12=$moy
+		d12=$good
+		c12=$moypa
+	fi
+	if test $(echo "$min < $xmin" | bc -l) -eq 1;then #recherche valeur min jounée
+		xmin="$min"
+		xdatemin=$datemin
+	fi
+	if test $(echo "$max > $xmax" | bc -l) -eq 1; then #recherche valeur max journée
+		xmax="$max"
+		xdatemax=$datemax
+	fi
+	y=$(echo "scale=2; ($moy + $y) " | bc -l ) #somme des moyennes
+	xreu=$[ $reu + $xreu ]
+	if test $(echo "$pamax > $xpamax" |bc -l ) -eq 1;then #recherche valeur max chargement journée
+		xpamax="$pamax"
+		xdatepamax="$datepamax"
+	fi
+	if test $(echo "$xpamin > $pamin" |bc -l ) -eq 1;then #recherche valeur min chargement journée
+		xpamin="$pamin"
+		xdatepamin="$datepamin"
+	fi
+	q=$(echo "scale=2; ($moypa +$q) " |bc -l ) #somme des moyennes chargement
+done
+xmoy=$(echo "scale=2; $z / $b" | bc -l ) #calcul moyenne ping journée
+xmoypa=$(echo "scale=2; $q / $b" |bc -l ) #calcul de la moyenne temps chargement journée
+xgood=$[ $xreu * 100 / 6 | bc -l ] #%reussite sur la journée
+nbtenta=$(echo "($b * $c)")
+duree=$( $b * 2 | bc -l)
+echo $duree
+echo "<b><u><h1>Rapport d'observation Datametrie du $(date +%d-%m-%y)</h1></u></b> 
+
+<p>Bonjour Mme Mr $nom<br>
+Votre FAI est $FAI </p>
+
+<p>Datametrie1 a effectué $nbtenta observations de l'adresse <u>$ad</u> sur les $duree dernières heures.</p>
+
+<p>Pour une valeur maximale acceptée de : $z ms
+- La performance moyenne a été de $xmoy ms<br>
+- Le taux de disponibilité a été de $xgood%</p>
+
+<p>La valeur de ping Minimum a été de $xmin ms à $xdatemin<br>
+La valeur de ping Maximum a été de $xmax ms à $xdatemax</p>
+
+<p>En général, pour un ping inférieur à $z ms, la page d'accueil de $ad s'ouvrait en 0$xmoypa ms</p>
+
+<p>Le temps de chargement le plus court a été de $pamin ms à $xdatepamin<br>
+Le temps de chargement le plus long a été de $pamax ms à $xdatepamax</p>
+
+<br />
+
+<style type="text/css">
+table {
+  border: 1px solid black;
+}
+tr {
+  border: 1px solid black;
+}
+td {
+  border: 1px solid black;
+}
+</style>
+
+<table>
+        <tr>
+                <td><b>Plage horaire</b></td>
+                <td><b>0h  2h</b></td>
+                <td><b>2h  4h</b></td>
+                <td><b>4h  6h</b></td>
+                <td><b>6h  8h</b></td>
+                <td><b>8h  10h</b></td>
+                <td><b>10h  12h</b></td>
+                <td><b>12h  14h</b></td>
+                <td><b>14h  16h</b></td>
+                <td><b>16h  18h</b></td>
+                <td><b>18h  20h</b></td>
+                <td><b>20h  22h</b></td>
+                <td><b>22h  24h</b></td>
+        </tr>
+
+        <tr>
+                <td><b>Ping moyen (millisecondes)</b></td>
+                <td>$p1</td>
+                <td>$p2</td>
+                <td>$p3</td>
+                <td>$p4</td>
+                <td>$p5</td>
+                <td>$p6</td>
+                <td>$p7</td>
+                <td>$p8</td>
+                <td>$p9</td>
+                <td>$p10</td>
+                <td>$p11</td>
+                <td>$p12</td>
+        </tr>
+
+        <tr>
+                <td><b>Disponibilité (en pourcentage)</b></td>
+                <td>$d1</td>
+                <td>$d2</td>
+                <td>$d3</td>
+                <td>$d4</td>
+                <td>$d5</td>
+                <td>$d6</td>
+                <td>$d7</td>
+                <td>$d8</td>
+                <td>$d9</td>
+                <td>$d10</td>
+                <td>$d11</td>
+                <td>$d12</td>
+        </tr>
+
+        <tr>
+                <td><b>Temps de chargement moyen (millisecondes)</b></td>
+                <td>0$c1</td>
+                <td>0$c2</td>
+                <td>0$c3</td>
+                <td>0$c4</td>
+                <td>0$c5</td>
+                <td>0$c6</td>
+                <td>0$c7</td>
+                <td>0$c8</td>
+                <td>0$c9</td>
+                <td>0$c10</td>
+                <td>0$c11</td>
+                <td>0$c12</td>
+        </tr>
+</table>
+
+
+<p>En espérant que nos résultats vous seront utile.<br>
+Amicalement votre</p>
+
+<p>L'équipe Datametrie1</p>" > Rapportdatametrie1.html
+
+mail -a "Mine-version: 1.0" -a "Content-Type: text/html" -s "Rapport d'Observation" $mail < Rapportdatametrie1.html
+

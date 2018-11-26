@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Test ok chargement page d'acceuil # remplacer site web par variable du client 
+
+
+# Si ping < 2 
+
+
+
+h=$(/usr/bin/time -f "%e" wget -q --delete-after  www.materiel.net 2>&1)
+
+
+echo " le temps de chargement de la page est de " $h ms
+
+# comparaison pour trouver le plus grand et le plus petit
+
+
+declare -i leplusgrand
+declare -i lepluspetit
+
+leplusgrand=0
+
+
+if [ $h -gt $leplusgrand]
+
+then $leplusgrand=$h
+
+else   $lepluspetit=$h
+
+fi
+
+ 
+
+
+
+
+
+# récolte temps de réponse 
+
+
+

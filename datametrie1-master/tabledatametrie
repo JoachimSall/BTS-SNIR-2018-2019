@@ -1,0 +1,64 @@
+
+<style type="text/css">
+table {
+  border: 1px solid black;
+}
+tr {
+  border: 1px solid black;
+}
+td {
+  border: 1px solid black;
+}
+</style>
+
+<table>
+	<tr>
+		<td>Plage horaire</td>
+		<td>0 a 2h</td>
+		<td>2 a 4h</td>
+		<td>4 a 6h</td>
+		<td>6 a 8h</td>
+		<td>8 a 10h</td>
+		<td>10 a 12h</td>
+		<td>12 a 14h</td>
+		<td>14 a 16h</td>
+		<td>16 a 18h</td>
+		<td>18 a 20h</td>
+		<td>20 a 22h</td>
+		<td>22 a 24h</td>
+	</tr>
+	
+	<tr>
+		<td>Ping moyen (millisecondes)</td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+	</tr>
+
+	<tr>
+        	<td>Temps de chargement moyen (millisecondes)</td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+        	<td></td>
+	</tr>
+</table>	
+
+
